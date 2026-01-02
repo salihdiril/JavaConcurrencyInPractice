@@ -1,18 +1,46 @@
 package com.salih.chapter2.ex1;
 
+import static com.salih.chapter2.FactorizerUtil.encodeIntoResponse;
+import static com.salih.chapter2.FactorizerUtil.extractFromRequest;
+import static com.salih.chapter2.FactorizerUtil.factor;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
-@WebServlet("/factor")
+@WebServlet("/factor/stateless")
 public class StatelessFactorizer extends HttpServlet {
+
+	/**
+	 * A <b>Thread-Safe</b> Servlet implementation that demonstrates the safety of <b>Stateless Objects</b>.
+	 * <p>
+	 * <b>Why is this Thread-Safe?</b>
+	 * This class is thread-safe because it has <b>no state</b> (no instance variables or fields).
+	 * </p>
+	 * <p>
+	 * <b>How it works internally:</b>
+	 * <ul>
+	 * <li>When the web server handles 1,000 concurrent requests, it creates 1,000 threads.</li>
+	 * <li>Each thread calls this {@code service()} method independently.</li>
+	 * <li>The variables {@code i} and {@code factors} are <b>Local Variables</b>.</li>
+	 * <li>Local variables are stored on the <b>Thread Stack</b>, not the Heap. This means every thread
+	 * has its own private copy of these variables.</li>
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * <b>The Rule:</b>
+	 * Since no data is shared between threads (no shared fields), it is physically impossible for one
+	 * thread to interfere with another. As stated in <i>Java Concurrency in Practice</i>:
+	 * <i>"Stateless objects are always thread-safe."</i>
+	 * </p>
+	 *
+	 * @param servletRequest  The servlet request (local to the thread)
+	 * @param servletResponse The servlet response (local to the thread)
+	 */
 	@Override
 	public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException {
 		BigInteger i = extractFromRequest(servletRequest);
@@ -20,40 +48,4 @@ public class StatelessFactorizer extends HttpServlet {
 		encodeIntoResponse(servletResponse, factors);
 	}
 
-	private BigInteger extractFromRequest(ServletRequest req) {
-		String numParam = req.getParameter("number");
-		if (numParam == null || numParam.isEmpty()) {
-			return BigInteger.ONE;
-		}
-
-		try {
-			return new BigInteger(numParam);
-		} catch (NumberFormatException e) {
-			return BigInteger.ONE;
-		}
-	}
-
-	private BigInteger[] factor(BigInteger i) {
-		List<BigInteger> factors = new ArrayList<>();
-		long n = i.longValue();
-
-		for (int j = 2; j <= n; j++) {
-			while (n % j == 0) {
-				factors.add(BigInteger.valueOf(j));
-				n /= j;
-			}
-		}
-
-		return factors.toArray(new BigInteger[0]);
-	}
-
-	private void encodeIntoResponse(ServletResponse resp, BigInteger[] factors) throws IOException {
-		resp.setContentType("text/plain");
-		PrintWriter out = resp.getWriter();
-		out.print("Factors: ");
-		for (BigInteger factor : factors) {
-			out.print(factor + " ");
-		}
-		out.println();
-	}
 }
