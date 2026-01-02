@@ -1,0 +1,22 @@
+# --- Build & Compiled Files ---
+target/
+out/
+*.class
+*.log
+*.jar
+*.war
+*.zip
+
+# --- IntelliJ IDEA (The XML files you want to hide) ---
+# This ignores the entire .idea folder and all project files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# --- Maven Wrapper (Optional, good to keep usually, but ignoring based on preference) ---
+.mvn/
+
+# --- OS System Files ---
+.DS_Store
+Thumbs.db
